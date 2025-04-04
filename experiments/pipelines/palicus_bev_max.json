@@ -1,0 +1,165 @@
+{
+  "crossbar": [
+    "FILTER",
+    "FILTER",
+    "FILTER",
+    "ARITH",
+    "ARITH",
+    "ARITH",
+    "AGG"
+  ],
+  "filter": [
+    {
+      "active": true,
+      "opcode": "AND",
+      "cells": [
+        {
+          "active": true,
+          "feature": "r",
+          "signed": false,
+          "opcode": "gt",
+          "register": 0
+        }
+      ]
+    },
+    {
+      "active": true,
+      "opcode": "AND",
+      "cells": [
+        {
+          "active": true,
+          "feature": "x",
+          "signed": true,
+          "opcode": "geq",
+          "register": -750
+        },
+        {
+          "active": true,
+          "feature": "x",
+          "signed": true,
+          "opcode": "leq",
+          "register": 750
+        }
+      ]
+    },
+    {
+      "active": true,
+      "opcode": "AND",
+      "cells": [
+        {
+          "active": true,
+          "feature": "y",
+          "signed": true,
+          "opcode": "geq",
+          "register": -750
+        },
+        {
+          "active": true,
+          "feature": "y",
+          "signed": true,
+          "opcode": "leq",
+          "register": 750
+        }
+      ]
+    }
+  ],
+  "arithmetic": [
+    {
+      "output_features": [
+        7,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "cells": [
+        {
+          "use_reg": true,
+          "signed": true,
+          "opcode": "add",
+          "feature_0": "x",
+          "register": 750
+        }
+      ]
+    },
+    {
+      "output_features": [
+        0,
+        7,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "cells": [
+        {
+          "use_reg": true,
+          "signed": true,
+          "opcode": "add",
+          "feature_0": "y",
+          "register": 750
+        }
+      ]
+    },
+    {
+      "output_features": [
+        7,
+        8,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "cells": [
+        {
+          "use_reg": true,
+          "signed": false,
+          "opcode": "div",
+          "feature_0": "x",
+          "register": 50
+        },
+        {
+          "use_reg": true,
+          "signed": false,
+          "opcode": "div",
+          "feature_0": "y",
+          "register": 50
+        }
+      ]
+    }
+  ],
+  "aggregation": [
+    {
+      "n_idx": 2,
+      "group_indices": [
+        0,
+        1
+      ],
+      "output_feature_indices": [
+        0,
+        0,
+        0
+      ],
+      "cells": [
+        {
+          "signed": true,
+          "opcode": "max",
+          "feature": "z"
+        }
+      ]
+    }
+  ],
+  "serialize": {
+    "items_per_packet": 128,
+    "features_per_item": 3,
+    "feature_indices": [
+      0,
+      1,
+      2
+    ]
+  }
+}

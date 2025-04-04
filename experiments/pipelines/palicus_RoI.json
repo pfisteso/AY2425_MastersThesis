@@ -1,0 +1,31 @@
+{
+    "crossbar": 
+    [
+        "FILTER"
+    ],
+    "filter": [
+        {
+            "active": true,
+            "opcode": "AND",
+            "cells": [
+                {
+                    "active": true,
+                    "feature": "r",
+                    "signed": false,
+                    "opcode": "gt",
+                    "register": 0
+                }
+            ]
+        }
+    ],
+    "serialize": {
+        "items_per_packet": 128,
+        "features_per_item": 3,
+        "feature_indices":
+        [
+            0,
+            1,
+            2
+        ]
+    }
+}

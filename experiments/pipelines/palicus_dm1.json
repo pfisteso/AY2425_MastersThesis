@@ -1,0 +1,62 @@
+{
+    "crossbar": 
+    [
+        "FILTER",
+        "ARITH"
+    ],
+    "filter": [
+        {
+            "active": true,
+            "opcode": "AND",
+            "cells": [
+                {
+                    "active": true,
+                    "feature": "r",
+                    "signed": false,
+                    "opcode": "gt",
+                    "register": 0
+                }
+            ]
+        }
+    ],
+    "arithmetic": [
+        {
+            "output_features": [
+                0,
+                1,
+                2,
+                3,
+                7,
+                8,
+                6
+            ],
+            "cells": 
+            [
+                {
+                    "use_reg": true,
+                    "signed": false,
+                    "opcode": "div",
+                    "feature_0": "a",
+                    "register": 10
+                },
+                {
+                    "use_reg": true,
+                    "signed": true,
+                    "opcode": "div",
+                    "feature_0": "w",
+                    "register": 2
+                }
+            ]
+        }
+    ],
+    "serialize": {
+        "items_per_packet": 128,
+        "features_per_item": 3,
+        "feature_indices":
+        [
+            4,
+            5,
+            3
+        ]
+    }
+}
