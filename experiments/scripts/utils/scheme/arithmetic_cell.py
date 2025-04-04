@@ -1,4 +1,4 @@
-from ..constants import FEATURE_STRING, ARITHMETIC_OPCODE_STRINGS
+from ..constants import ARITHMETIC_OPCODE_STRINGS
 
 scheme = {
     'type': 'object',

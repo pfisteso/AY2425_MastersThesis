@@ -1,1 +1,4 @@
 jsonschema
+pypcapkit
+pandas
+numpy
