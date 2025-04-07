@@ -15,6 +15,7 @@ def annotate_lidar_packet(packet, pkt_nr: int, curr_frame_nr:int, delta_phi:floa
     block_length = 2 + 2 * 3 * 16  # Azimuth (2B) + 2 Firing Sequences (16 Points x 3B)
     end = start + block_length
     while end <= len(payload):
+        assert payload[start-2:start].hex() == 'ffee'  # start after the flag marking the next data block
         # first firing sequence: read azimuth from file
         azimuth = int.from_bytes(payload[start:start + 2], "little", signed=False) / 100.0
         if azimuth < prev_azimuth:
