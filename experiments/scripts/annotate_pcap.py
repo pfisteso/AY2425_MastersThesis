@@ -1,8 +1,8 @@
 import os
 import argparse
-from pcapkit import extract
 import numpy as np
 import pandas as pd
+from pcapkit import extract
 
 from utils import annotate_lidar_packet, annotate_palicus_packet
 

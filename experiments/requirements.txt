@@ -2,3 +2,7 @@ jsonschema
 pypcapkit
 pandas
 numpy
+matplotlib
+pillow
+open3d==0.14.1
+

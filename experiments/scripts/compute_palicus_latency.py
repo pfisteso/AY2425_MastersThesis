@@ -38,9 +38,10 @@ def compute_latency(input_dir: str, output_file: str):
             seconds=palicus_timestamp.second - lidar_timestamp.second,
             microseconds=palicus_timestamp.microsecond - lidar_timestamp.microsecond
         )
-
         latency_ms = (latency.seconds * (10 ** 3) + latency.microseconds * (10 ** -3))
         frame_latencies.append([f_tar, latency_ms])
+        if latency_ms > 1.0:
+            print(f_src, palicus_timestamp, f_tar, lidar_timestamp, latency)
 
     df_res = pd.DataFrame(np.array(frame_latencies), columns=['frame_nr', 'latency [ms]'])
     df_res.to_csv(output_file_path, index=False)
