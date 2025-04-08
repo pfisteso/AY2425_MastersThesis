@@ -1,0 +1,7 @@
+*venv
+*/*venv
+experiments/.idea
+experiments/data/*/*/lidar.csv
+experiments/data/*/*/palicus.csv
+experiments/data/*/*/palicus_frame_map.csv
+experiments/data/*/*/traffic.pcap
