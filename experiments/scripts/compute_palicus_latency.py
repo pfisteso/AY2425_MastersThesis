@@ -4,7 +4,8 @@ import numpy as np
 import pandas as pd
 from datetime import timedelta, datetime
 
-def compute_latency(input_dir:str, output_file:str):
+
+def compute_latency(input_dir: str, output_file: str):
     assert os.path.exists(input_dir), 'invalid input directory'
     lidar_file = os.path.join(input_dir, "lidar.csv")
     assert os.path.exists(lidar_file), 'lidar file not found'
@@ -38,7 +39,7 @@ def compute_latency(input_dir:str, output_file:str):
             microseconds=palicus_timestamp.microsecond - lidar_timestamp.microsecond
         )
 
-        latency_ms = (latency.seconds * (10 ** 3) + latency.microseconds * (10 **-3))
+        latency_ms = (latency.seconds * (10 ** 3) + latency.microseconds * (10 ** -3))
         frame_latencies.append([f_tar, latency_ms])
 
     df_res = pd.DataFrame(np.array(frame_latencies), columns=['frame_nr', 'latency [ms]'])
@@ -54,4 +55,3 @@ if __name__ == "__main__":
 
     args = arg_parser.parse_args()
     compute_latency(args.input_dir, args.output_file)
-

@@ -19,8 +19,7 @@ def smooth_palicus(palicus_data: pd.DataFrame, max_pkt: int, output_dir: str):
     for row in packet_count.itertuples():
         if row.pkt_nr > max_pkt:
             offset += row.pkt_nr // max_pkt
-        else:
-            packet_map.append([row.frame_nr, row.frame_nr + offset])
+        packet_map.append([row.frame_nr, row.frame_nr + offset])
     pd.DataFrame(np.array(packet_map), columns=['frame_nr', 'maps_to']).to_csv(
         os.path.join(output_dir, 'palicus_frame_map.csv'), index=False)
 
@@ -65,8 +64,7 @@ def annotate_pacp_traffic(input_file: str, output_dir: str, palicus_ip: str, lid
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--input-file", metavar='input_file', required=True, help="path to the input file")
-    parser.add_argument("--output-dir", metavar='output_dir', required=True, help="directory to store the result")
+    parser.add_argument("--dir", metavar='dir', required=True, help='working directory')
     parser.add_argument("--lidar-ip", metavar='lidar_ip', required=False, default=LIDAR_IP)
     parser.add_argument("--palicus-ip", metavar='palicus_ip', required=False, default=PALICUS_IP)
     parser.add_argument('--delta-phi', metavar='delta_phi', default=0.1,
@@ -74,7 +72,10 @@ if __name__ == "__main__":
     parser.add_argument("--max-palicus-pkt", metavar='max_palicus_pkt', required=False, default=MAX_PKT)
 
     args = parser.parse_args()
+    input_file = os.path.join(args.dir, 'traffic.pcap')
 
-    annotate_pacp_traffic(args.input_file, args.output_dir,
+    annotate_pacp_traffic(input_file, args.dir,
                           palicus_ip=args.palicus_ip, lidar_ip=args.lidar_ip,
                           delta_phi=args.delta_phi, max_pkt=int(args.max_palicus_pkt))
+    # df_palicus = pd.read_csv(os.path.join(args.output_dir, 'palicus.csv'))
+    # smooth_palicus(df_palicus, args.max_palicus_pkt, args.output_dir)
