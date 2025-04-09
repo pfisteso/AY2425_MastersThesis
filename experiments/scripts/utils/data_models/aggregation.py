@@ -3,7 +3,8 @@ from jsonschema import validate
 
 from .utils import zero_pad
 from ..scheme import aggregation_unit_scheme, aggregation_cell_scheme
-from ..constants import SIGNED_FEATURES, FEATURE_MAP, N_AGG_INDICES, N_FEATURES, AGG_CELL_CONFIG_LENGTH, AGGREGATION_OPCODE_MAP
+from ..constants import FEATURE_MAP, N_FEATURES
+from ..constants import N_AGG_CELLS, N_AGG_INDICES, AGG_CELL_CONFIG_LENGTH, AGGREGATION_OPCODE_MAP
 
 
 class AggregationCell:
@@ -48,14 +49,14 @@ class AggregationUnit:
         while len(self.group_indices) < N_AGG_INDICES:
             self.group_indices.append(0)
         # cells
-        assert len(kwargs['cells']) <= N_FEATURES
+        assert len(kwargs['cells']) <= N_AGG_CELLS
         self.cells = [AggregationCell(**c) for c in kwargs['cells']]
 
         # output features
-        assert len(kwargs['output_feature_indices']) <= N_FEATURES
+        assert len(kwargs['output_feature_indices']) <= N_AGG_CELLS
         self.output_feature_indices = kwargs['output_feature_indices']
-        while len(self.output_feature_indices) < N_FEATURES:
-            self.output_feature_indices.append(N_FEATURES)
+        while len(self.output_feature_indices) < N_AGG_CELLS:
+            self.output_feature_indices.append(N_AGG_CELLS)
         if len(self.output_feature_indices) % 2 == 1:
             self.output_feature_indices.append(0)
 
@@ -79,6 +80,6 @@ class AggregationUnit:
         cell_bytes = bytearray()
         for cell in self.cells:
             cell_bytes.extend(cell.get_config_bytes())
-        zero_pad(cell_bytes, N_FEATURES * AGG_CELL_CONFIG_LENGTH)
+        zero_pad(cell_bytes, N_AGG_CELLS * AGG_CELL_CONFIG_LENGTH)
         unit_bytes.extend(cell_bytes)
         return unit_bytes

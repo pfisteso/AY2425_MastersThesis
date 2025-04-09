@@ -1,5 +1,5 @@
 from . import aggregation_cell_scheme
-from ..constants import N_FEATURES, N_AGG_INDICES
+from ..constants import N_AGG_CELLS, N_AGG_INDICES
 
 scheme = {
     'type': 'object',
@@ -14,13 +14,13 @@ scheme = {
             'type': 'array',
             'items': aggregation_cell_scheme,
             'minItems': 1,
-            'maxItems': N_FEATURES
+            'maxItems': N_AGG_CELLS
         },
         'output_feature_indices': {
             'type': 'array',
             'items': {'type': 'integer'},
             'minItems': 1,
-            'maxItems': N_FEATURES
+            'maxItems': N_AGG_CELLS
         }
     },
     'required': ['n_idx', 'group_indices', 'cells', 'output_feature_indices']

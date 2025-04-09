@@ -140,8 +140,6 @@
         1
       ],
       "output_feature_indices": [
-        0,
-        0,
         0
       ],
       "cells": [
@@ -159,7 +157,7 @@
     "feature_indices": [
       0,
       1,
-      2
+      3
     ]
   }
 }
