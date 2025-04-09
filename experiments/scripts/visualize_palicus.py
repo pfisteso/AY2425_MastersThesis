@@ -9,9 +9,9 @@ from utils import extract_palicus_data, visualize2d, visualize3d
 PALICUS_IP = '192.168.88.202'
 
 
-def parse_palicus_data(filepath: str, ip: str, frame_nr: int, columns: List[str], scales: List[float], signed: List[bool]) -> pd.DataFrame:
-    assert os.path.exists(filepath) and os.path.isfile(filepath) and filepath.endswith('.pcap'), 'invalid input file'
-    data = extract(filepath, nofile=True)
+def parse_palicus_data(input_file: str, ip: str, frame_nr: int, columns: List[str], scales: List[float], signed: List[bool]) -> pd.DataFrame:
+    assert os.path.exists(input_file) and os.path.isfile(input_file) and input_file.endswith('.pcap'), 'invalid input file'
+    data = extract(input_file, nofile=True)
     frame_data = None
 
     for f in data.frame:
@@ -39,9 +39,9 @@ if __name__ == '__main__':
     parser.add_argument('--frame-nr', required=True)
     parser.add_argument("--palicus-ip", required=False, default=PALICUS_IP)
     parser.add_argument('--dimensionality', required=False, default=2)
-    parser.add_argument("--scale-x", required=False, default=250)
-    parser.add_argument("--scale-y", required=False, default=250)
-    parser.add_argument("--scale-z", required=False, default=250)
+    parser.add_argument("--scale-x", required=False, default=1 / 250)
+    parser.add_argument("--scale-y", required=False, default=1 / 250)
+    parser.add_argument("--scale-z", required=False, default=1 / 250)
     parser.add_argument('--signed-x', required=False, default=True)
     parser.add_argument('--signed-y', required=False, default=True)
     parser.add_argument('--signed-z', required=False, default=True)
