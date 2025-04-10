@@ -20,10 +20,10 @@ def load_packet_data(throughput: str = '8Mbps', pipeline: str = 'conversion', ma
     return res
 
 
-def clean_latency_data(data: pd.DataFrame) -> pd.DataFrame:
-    mean = data.mean()['latency [ms]']
-    std = data.std()['latency [ms]']
+def clean_latency_data(data: pd.DataFrame, col: str ='latency [ms]', factor: int = 2) -> pd.DataFrame:
+    mean = data.mean()[col]
+    std = data.std()[col]
 
-    data = data.loc[data['latency [ms]'] >= mean - 2 * std]
-    data = data.loc[data['latency [ms]'] <= mean + 2 * std]
+    data = data.loc[data[col] >= mean - factor * std]
+    data = data.loc[data[col] <= mean + factor * std]
     return data
