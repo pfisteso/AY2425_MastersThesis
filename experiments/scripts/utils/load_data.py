@@ -6,8 +6,9 @@ def load_latency_data(pipeline: str = 'conversion', frame_min: int = 1, frame_ma
     filepath = os.path.join('./data', pipeline, 'latency', 'latency.csv')
     return _load_and_trim_pcap(filepath, frame_min, frame_max)
 
-def load_packet_count_data(pipeline: str = 'conversion', frame_min: int = 1, frame_max: int = 525) -> pd.DataFrame:
-    pass
+def load_frame_size_data(pipeline: str = 'conversion', frame_min: int = 1, frame_max: int = 525) -> pd.DataFrame:
+    filepath = os.path.join('./data', pipeline, 'point_rate', 'frame_size.csv')
+    return _load_and_trim_pcap(filepath, frame_min, frame_max)
 
 
 # ToDo: refactor this function for multiple replays
@@ -31,6 +32,6 @@ def clean_latency_data(data: pd.DataFrame, col: str ='latency [ms]', factor: int
 def _load_and_trim_pcap(filepath, frame_min: int = 1, frame_max: int = 525) -> pd.DataFrame:
     assert os.path.exists(filepath), 'invalid file path: {}'.format(filepath)
     res = pd.read_csv(filepath)
-    res = res.loc[res['frame_nr'] >= frame_min]
-    res = res.loc[res['frame_nr'] <= frame_max]
+    res = res.loc[res['frame_nr'] != frame_min - 1]
+    res = res.loc[res['frame_nr'] != frame_max + 1]
     return res
