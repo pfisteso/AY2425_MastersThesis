@@ -26,6 +26,7 @@ def visualize2d(frame: pd.DataFrame, flip_img: bool = False):
     if flip_img:
         img = flip(img)
     img.show()
+    img.save('./figures/vis.png')
 
 
 def visualize3d(frame: pd.DataFrame):
