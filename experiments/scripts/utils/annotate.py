@@ -73,6 +73,8 @@ def extract_palicus_data(packet, extract_frame: int, columns: List[str], scale: 
             start = end
             end = start + point_length
         result = pd.DataFrame(np.array(points), columns=columns)
+        if (f0 == 0 and f1 == 0 and f2 == 0):
+            print('all zero element')
 
     return valid, continue_, result
 
