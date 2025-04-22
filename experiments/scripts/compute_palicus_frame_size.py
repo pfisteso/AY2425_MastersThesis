@@ -67,7 +67,7 @@ if __name__ == '__main__':
 
     assert args.experiment in ['latency', 'point_rate'], 'invalid experiment {}'.format(args.experiment)
 
-    throughput = [1, 2, 3, 4, 5] if args.experiment == 'latency' else [8, 16, 32, 64]  # ToDo: 128
+    throughput = [1, 2, 3, 4, 5] if args.experiment == 'latency' else [8, 16, 32, 64, 128]
 
     eval_frame_size(input_dir, throughput=throughput, palicus_ip=args.palicus_ip, n_ftrs=args.n_ftrs,
                     experiment=args.experiment, reload=args.reload)
