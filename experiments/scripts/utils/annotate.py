@@ -1,6 +1,6 @@
+import math
 import numpy as np
 import pandas as pd
-from typing import Tuple, List
 
 
 def annotate_lidar_packet(packet, pkt_nr: int, curr_frame_nr: int, delta_phi: float, prev_azimuth: float):
@@ -52,31 +52,39 @@ def annotate_palicus_packet(packet, pkt_nr: int):
     return pd.DataFrame(np.array([[pkt_nr, timestamp, frame_nr]]), columns=['pkt_nr', 'timestamp', 'frame_nr'])
 
 
-def extract_palicus_data(packet, extract_frame: int, columns: List[str], scale: List[float], signed: List[bool]) -> Tuple[bool, bool, pd.DataFrame]:
-    payload = packet.payload.payload.payload.payload.data
-    frame_nr = int.from_bytes(payload[0:2], byteorder='big', signed=False)
+def apply_conversion(point_cloud: pd.DataFrame) -> pd.DataFrame:
+    point_cloud['x'] = point_cloud.apply(lambda row: row['radius'] * math.cos(math.radians(row['elevation'])) * math.sin(math.radians(row['azimuth'])), axis=1)
+    point_cloud['y'] = point_cloud.apply(lambda row: row['radius'] * math.cos(math.radians(row['elevation'])) * math.cos(math.radians(row['azimuth'])), axis=1)
+    point_cloud['z'] = point_cloud.apply(lambda row: row['radius'] * math.sin(math.radians(row['elevation'])), axis=1)
+    return point_cloud
 
-    result = None
-    valid = frame_nr == extract_frame
-    continue_ = frame_nr <= extract_frame
 
-    if valid:
-        start = 2
-        point_length = 2 * 3
-        end = start + point_length
-        points = []
-        while end <= len(payload):
-            f0 = int.from_bytes(payload[start:start+2], byteorder='big', signed=signed[0]) * scale[0]
-            f1 = int.from_bytes(payload[start+2:start+4], byteorder='big', signed=signed[1]) * scale[1]
-            f2 = int.from_bytes(payload[start+4:end], byteorder='big', signed=signed[2]) * scale[2]
-            points.append([f0, f1, f2])
-            start = end
-            end = start + point_length
-        result = pd.DataFrame(np.array(points), columns=columns)
-        if (f0 == 0 and f1 == 0 and f2 == 0):
-            print('all zero element')
+def apply_roi(point_cloud: pd.DataFrame) -> pd.DataFrame:
+    point_cloud = point_cloud.loc[point_cloud['radius'] > 0]
+    point_cloud = apply_conversion(point_cloud)
+    return point_cloud
 
-    return valid, continue_, result
 
-def extract_lidar_data(packet, extract_frame: int, prev_frame: int, prev_azimuth: int) -> pd.DataFrame:
-    pass
+def apply_dm(point_cloud: pd.DataFrame, pipeline: int, delta_alpha: float) -> pd.DataFrame:
+    assert pipeline in [1, 2]
+    point_cloud = apply_roi(point_cloud)
+    point_cloud['px'] = point_cloud.apply(lambda row: math.floor(row['azimuth'] / delta_alpha), axis=1)
+    if pipeline == 1:
+        point_cloud['py'] = point_cloud.apply(lambda row: math.floor(row['elevation'] / 2), axis=1)
+    else:  # pipeline == 2
+        point_cloud['py'] = point_cloud.apply(lambda row: math.floor((row['elevation'] + 15) / 2), axis=1)
+
+    return point_cloud
+
+
+def apply_bev(point_cloud: pd.DataFrame) -> pd.DataFrame:
+    point_cloud = apply_roi(point_cloud)
+    point_cloud = point_cloud.loc[point_cloud['x'] >= -3]
+    point_cloud = point_cloud.loc[point_cloud['x'] <= 3]
+    point_cloud = point_cloud.loc[point_cloud['y'] >= -3]
+    point_cloud = point_cloud.loc[point_cloud['y'] <= 3]
+    point_cloud['px'] = point_cloud.apply(lambda row: math.floor((row['x'] + 3) / 0.2), axis=1)
+    point_cloud['py'] = point_cloud.apply(lambda row: math.floor((row['y'] + 3) / 0.2), axis=1)
+
+    bev = point_cloud.grouby(['px', 'py']).max('z')
+    return bev

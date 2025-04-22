@@ -5,10 +5,7 @@ import pandas as pd
 from pcapkit import extract
 
 from utils import annotate_lidar_packet, annotate_palicus_packet
-
-LIDAR_IP = '192.168.1.201'
-PALICUS_IP = '192.168.88.202'
-
+from utils.constants import LIDAR_IP, PALICUS_IP
 
 def annotate_pacp_traffic(input_file: str, output_dir: str, palicus_ip: str, lidar_ip: str, delta_phi: float, t: int):
     assert os.path.exists(input_file) and os.path.isfile(input_file) and input_file.endswith('.pcap'), 'invalid input file'

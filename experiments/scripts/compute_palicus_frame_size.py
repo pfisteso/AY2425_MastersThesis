@@ -4,7 +4,7 @@ import pandas as pd
 from typing import List
 from pcapkit import extract
 
-PALICUS_IP = '192.168.88.202'
+from utils.constants import PALICUS_IP
 
 
 def eval_frame_size(directory: str, throughput: List[int], palicus_ip: str, n_ftrs: int, experiment: str,

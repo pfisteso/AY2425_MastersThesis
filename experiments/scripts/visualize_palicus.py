@@ -1,36 +1,7 @@
-import os
 import argparse
-import pandas as pd
-from pcapkit import extract
-from typing import List
 
-from utils import extract_palicus_data, visualize2d, visualize3d
-
-PALICUS_IP = '192.168.88.202'
-
-
-def parse_palicus_data(input_file: str, ip: str, frame_nr: int, columns: List[str], scales: List[float], signed: List[bool]) -> pd.DataFrame:
-    assert os.path.exists(input_file) and os.path.isfile(input_file) and input_file.endswith('.pcap'), 'invalid input file'
-    data = extract(input_file, nofile=True)
-    frame_data = None
-
-    for f in data.frame:
-        try:
-            ip_src = f.info.ethernet.ipv4.src.exploded
-            if ip_src != ip:
-                continue
-            valid, continue_, data = extract_palicus_data(f, frame_nr, columns, scales, signed)
-            if not continue_:
-                break
-            if valid:
-                if frame_data is None:
-                    frame_data = data
-                else:
-                    frame_data = pd.concat([frame_data, data])
-        except Exception as e:
-            print('ERROR when parsing packet: ', str(e))
-            continue
-    return frame_data
+from utils.constants import PALICUS_IP
+from utils import load_palicus_frame, visualize2d, visualize3d
 
 
 if __name__ == '__main__':
@@ -55,7 +26,8 @@ if __name__ == '__main__':
     ftr_factors = [float(args.scale_x), float(args.scale_y), float(args.scale_z)]
     ftrs_signed = [bool(args.signed_x), bool(args.signed_y), bool(args.signed_z)]
 
-    parsed_data = parse_palicus_data(args.pcap_file, args.palicus_ip, int(args.frame_nr), ftrs, ftr_factors, ftrs_signed)
+    parsed_data = load_palicus_frame(input_file=args.pcap_file, ip=args.palicus_ip, frame_nr=args.frame_nr,
+                                     columns=ftrs, scales=ftr_factors, signed=ftrs_signed)
 
     if int(args.dimensionality) == 2:
         visualize2d(parsed_data, flip_img=bool(args.flip_img))
