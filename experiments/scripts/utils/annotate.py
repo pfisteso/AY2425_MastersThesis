@@ -78,6 +78,26 @@ def apply_dm(point_cloud: pd.DataFrame, pipeline: int, delta_alpha: float) -> pd
 
 
 def apply_bev(point_cloud: pd.DataFrame) -> pd.DataFrame:
+    point_cloud = _annotate_bev(point_cloud)
+
+    bev = point_cloud.groupby(['frame_nr', 'px', 'py']).max()['z']
+    bev = bev.reset_index(drop=False)
+    return bev
+
+def apply_bev_mean_i(point_cloud: pd.DataFrame) -> pd.DataFrame:
+    point_cloud = _annotate_bev(point_cloud)
+    bev = point_cloud.groupby(['frame_nr', 'px', 'py']).mean()['reflectance']
+    bev = bev.reset_index(drop=False)
+    return bev
+
+def apply_bev_count(point_cloud: pd.DataFrame) -> pd.DataFrame:
+    point_cloud = _annotate_bev(point_cloud)
+    bev = point_cloud.groupby(['frame_nr', 'px', 'py']).count()['z']
+    bev = bev.reset_index(drop=False)
+    return bev
+
+
+def _annotate_bev(point_cloud: pd.DataFrame) -> pd.DataFrame:
     point_cloud = apply_roi(point_cloud)
     point_cloud = point_cloud.loc[point_cloud['x'] >= -3]
     point_cloud = point_cloud.loc[point_cloud['x'] <= 3]
@@ -86,5 +106,4 @@ def apply_bev(point_cloud: pd.DataFrame) -> pd.DataFrame:
     point_cloud['px'] = point_cloud.apply(lambda row: math.floor((row['x'] + 3) / 0.2), axis=1)
     point_cloud['py'] = point_cloud.apply(lambda row: math.floor((row['y'] + 3) / 0.2), axis=1)
 
-    bev = point_cloud.grouby(['px', 'py']).max('z')
-    return bev
+    return point_cloud

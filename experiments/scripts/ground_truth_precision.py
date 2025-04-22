@@ -48,7 +48,7 @@ if __name__ == '__main__':
         print('Extract LiDAR data ...')
         gt_point_cloud = extract_lidar(lidar_file, args.lidar_ip, args.delta_phi)
         gt_point_cloud.to_csv(gt_path, index=False)
-        print('\tdone')
+        print('... done')
     else:
         gt_point_cloud = pd.read_csv(gt_path)
 
@@ -63,23 +63,16 @@ if __name__ == '__main__':
         print('Build target representation...')
         if pipeline == 'conversion':
             gt = apply_conversion(gt_point_cloud)
-            gt.to_csv(gt_path, index=False)
-
         if pipeline == 'roi':
             gt = apply_roi(gt_point_cloud)
-            gt.to_csv(gt_path, index=False)
-
         if pipeline == 'dm1':
             gt = apply_dm(gt_point_cloud, pipeline=1, delta_alpha=args.delta_phi)
-            gt.to_csv(gt_path, index=False)
-
         if pipeline == 'dm2':
             gt = apply_dm(gt_point_cloud, pipeline=2, delta_alpha=args.delta_phi)
-            gt.to_csv(gt_path, index=False)
-
         else:  # bev, max
             gt = apply_bev(gt_point_cloud)
-            gt.to_csv(gt_path, index=False)
+
+        gt.to_csv(gt_path, index=False)
         print('\tdone')
 
 

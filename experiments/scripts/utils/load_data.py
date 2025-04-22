@@ -24,6 +24,12 @@ def clean_latency_data(data: pd.DataFrame, col: str ='latency [ms]', factor: int
     data = data.loc[data[col] <= mean + factor * std]
     return data
 
+def load_ground_truth(pipeline: str = 'conversion') -> pd.DataFrame:
+    filepath = os.path.join('./data', pipeline, 'precision', 'ground_truth.csv')
+    assert os.path.exists(filepath), 'invalid filepath: {}'.format(filepath)
+
+    return pd.read_csv(filepath)
+
 
 # -- PCAP --- #
 def load_palicus_frame(input_file: str, ip: str, frame_nr: int, columns: List[str], scales: List[float], signed: List[bool]) -> pd.DataFrame:
@@ -49,6 +55,7 @@ def load_palicus_frame(input_file: str, ip: str, frame_nr: int, columns: List[st
             continue
     return frame_data
 
+
 def load_lidar_data(packet, prev_frame: int, prev_azimuth: int, delta_alpha:float) -> Tuple[int, float, pd.DataFrame]:
     payload = packet.payload.payload.payload.payload.data
     frame_nr = prev_frame
@@ -61,6 +68,7 @@ def load_lidar_data(packet, prev_frame: int, prev_azimuth: int, delta_alpha:floa
         # first firing sequence: read azimuth from file
         azimuth = int.from_bytes(payload[start:start + 2], "little", signed=False) / 100.0
         if azimuth < prev_azimuth:
+            print('\tdone with frame ', frame_nr)
             frame_nr += 1
         prev_azimuth = azimuth
 
@@ -77,6 +85,7 @@ def load_lidar_data(packet, prev_frame: int, prev_azimuth: int, delta_alpha:floa
         azimuth += delta_alpha
         azimuth = azimuth - 360.0 if azimuth > 360.0 else azimuth
         if azimuth < prev_azimuth:
+            print('\tdone with frame ', frame_nr)
             frame_nr += 1
         prev_azimuth = azimuth
 
