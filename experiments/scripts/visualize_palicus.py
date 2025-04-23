@@ -8,6 +8,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--pcap-file', required=True)
     parser.add_argument('--frame-nr', required=True,  type=int)
+    parser.add_argument('--output-file', required=True)
+
     parser.add_argument("--palicus-ip", required=False, default=PALICUS_IP)
     parser.add_argument('--dimensionality', required=False, type=int, default=2)
     parser.add_argument("--scale-x", required=False, type=float, default=1 / 250)

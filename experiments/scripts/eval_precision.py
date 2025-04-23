@@ -1,0 +1,94 @@
+import os
+import math
+import argparse
+import pandas as pd
+
+def eval_precision_point_cloud(ground_truth: str, palicus: str, out_path: str):
+    global_result = []
+
+    for file in os.listdir(ground_truth):
+        assert file in os.listdir(palicus), 'invalid file: {}'.format(file)
+        frame = int(file.split('.')[0])
+
+        gt_file = os.path.join(ground_truth, file)
+        palicus_file = os.path.join(palicus, file)
+
+        assert os.path.exists(gt_file), 'invalid file: {}'.format(gt_file)
+        assert os.path.exists(palicus_file), 'invalid file: {}'.format(palicus_file)
+
+        gt = pd.read_csv(gt_file).loc[:, ['x', 'y', 'z']]
+        pal = pd.read_csv(palicus_file)
+        pal.rename(columns={'x': 'x_pal', 'y': 'y_pal', 'z': 'z_pal'}, inplace=True)
+
+        if len(gt) != len(pal):
+            print('skip frame ', frame)
+            continue
+        df_compare = pd.concat([gt, pal], axis=1)
+        df_compare['diff'] = df_compare.apply(lambda row:
+                                        math.sqrt((row['x'] - row['x_pal']) ** 2 +
+                                                  (row['y'] - row['y_pal']) ** 2 +
+                                                  (row['z'] - row['z_pal']) ** 2), axis=1)
+
+        min_ = df_compare.min()['diff']
+        max_ = df_compare.max()['diff']
+        mean_error = df_compare.mean()['diff']
+
+        global_result.append([frame, mean_error, min_, max_])
+        print('\tdone with frame ', frame)
+
+    df_result = pd.DataFrame(global_result, columns=['frame', 'mean error', 'min', 'max'])
+    df_result.to_csv(out_path, index=False)
+
+def eval_precision_image(ground_truth: str, palicus: str, out_path: str, ftr: str):
+    global_result = []
+
+    for file in os.listdir(ground_truth):
+        assert file in os.listdir(palicus), 'invalid file: {}'.format(file)
+        frame = int(file.split('.')[0])
+
+        gt_image = pd.read_csv(os.path.join(ground_truth, file))
+        gt_image.rename(columns={ftr: 'GT'}, inplace=True)
+
+        pal_image = pd.read_csv(os.path.join(palicus, file))
+        pal_image.rename(columns={ftr: 'PAL'}, inplace=True)
+
+        df_compare = pd.merge(gt_image, pal_image, how='outer', on=['px', 'py'])
+        df_compare['diff'] = df_compare.apply(lambda row: abs(row['GT'] - row['PAL']), axis=1)
+        min_ = df_compare.min()['diff']
+        max_ = df_compare.max()['diff']
+        mean_error = df_compare.mean()['diff']
+
+        global_result.append([frame, mean_error, min_, max_])
+        print('\tdone with frame ', frame)
+
+    df_result = pd.DataFrame(global_result, columns=['frame', 'mean error', 'min', 'max'])
+    df_result.to_csv(out_path, index=False)
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument('--pipeline', required=True)
+
+    parser.add_argument('--data-dir', required=False, default='./data')
+
+    args = parser.parse_args()
+
+    assert args.pipeline in ['bev', 'conversion', 'dm1', 'dm2', 'max', 'roi']
+
+    gt_dir = os.path.join(args.data_dir, args.pipeline, 'precision', 'ground_truth')
+    palicus_dir = os.path.join(args.data_dir, args.pipeline, 'precision', 'palicus')
+
+    assert os.path.exists(gt_dir)
+    assert os.path.exists(palicus_dir)
+    assert len(os.listdir(gt_dir)) == len(os.listdir(palicus_dir))
+
+    output_path = os.path.join(args.data_dir, args.pipeline, 'precision', 'precision.csv')
+
+    if args.pipeline in ['dm1', 'dm2', 'bev', 'max']:
+        f = 'z' if args.pipeline in ['bev', 'max'] else 'radius'
+        eval_precision_image(gt_dir, palicus_dir, output_path, f)
+
+    else:
+        eval_precision_point_cloud(gt_dir, palicus_dir, output_path)
+

@@ -24,36 +24,40 @@ def clean_latency_data(data: pd.DataFrame, col: str ='latency [ms]', factor: int
     data = data.loc[data[col] <= mean + factor * std]
     return data
 
-def load_ground_truth(pipeline: str = 'conversion') -> pd.DataFrame:
-    filepath = os.path.join('./data', pipeline, 'precision', 'ground_truth.csv')
+
+def load_ground_truth(pipeline: str, frame_nr: int) -> pd.DataFrame:
+    filename = str(frame_nr).zfill(6) + '.csv'
+    filepath = os.path.join('./data', pipeline, 'precision', 'ground_truth', filename)
+    assert os.path.exists(filepath), 'invalid filepath: {}'.format(filepath)
+
+    return pd.read_csv(filepath)
+
+
+def load_representation(pipeline: str, frame_nr: int, ground_truth: bool = False) -> pd.DataFrame:
+    subdir = 'ground_truth' if ground_truth else 'palicus'
+    filename = str(frame_nr).zfill(6) + '.csv'
+    filepath = os.path.join('./data', pipeline, 'precision', subdir, filename)
     assert os.path.exists(filepath), 'invalid filepath: {}'.format(filepath)
 
     return pd.read_csv(filepath)
 
 
 # -- PCAP --- #
-def load_palicus_frame(input_file: str, ip: str, frame_nr: int, columns: List[str], scales: List[float], signed: List[bool]) -> pd.DataFrame:
-    assert os.path.exists(input_file) and os.path.isfile(input_file) and input_file.endswith('.pcap'), 'invalid input file'
-    data = extract(input_file, nofile=True)
-    frame_data = None
-
-    for f in data.frame:
-        try:
-            ip_src = f.info.ethernet.ipv4.src.exploded
-            if ip_src != ip:
-                continue
-            valid, continue_, data = _extract_palicus_packet(f, frame_nr, columns, scales, signed)
-            if not continue_:
-                break
-            if valid:
-                if frame_data is None:
-                    frame_data = data
-                else:
-                    frame_data = pd.concat([frame_data, data])
-        except Exception as e:
-            print('ERROR when parsing packet: ', str(e))
-            continue
-    return frame_data
+def load_palicus_data(payload: bytes, columns:List[str], signed:List[bool], scale:List[float]) -> Tuple[int, pd.DataFrame]:
+    frame_nr = int.from_bytes(payload[0:2], byteorder='big', signed=False)
+    start = 2
+    point_length = 2 * 3
+    end = start + point_length
+    points = []
+    while end <= len(payload):
+        f0 = int.from_bytes(payload[start:start + 2], byteorder='big', signed=signed[0]) * scale[0]
+        f1 = int.from_bytes(payload[start + 2:start + 4], byteorder='big', signed=signed[1]) * scale[1]
+        f2 = int.from_bytes(payload[start + 4:end], byteorder='big', signed=signed[2]) * scale[2]
+        points.append([f0, f1, f2])
+        start = end
+        end = start + point_length
+    result = pd.DataFrame(np.array(points), columns=columns)
+    return frame_nr, result
 
 
 def load_lidar_data(packet, prev_frame: int, prev_azimuth: int, delta_alpha:float) -> Tuple[int, float, pd.DataFrame]:
@@ -68,7 +72,6 @@ def load_lidar_data(packet, prev_frame: int, prev_azimuth: int, delta_alpha:floa
         # first firing sequence: read azimuth from file
         azimuth = int.from_bytes(payload[start:start + 2], "little", signed=False) / 100.0
         if azimuth < prev_azimuth:
-            print('\tdone with frame ', frame_nr)
             frame_nr += 1
         prev_azimuth = azimuth
 
@@ -85,7 +88,6 @@ def load_lidar_data(packet, prev_frame: int, prev_azimuth: int, delta_alpha:floa
         azimuth += delta_alpha
         azimuth = azimuth - 360.0 if azimuth > 360.0 else azimuth
         if azimuth < prev_azimuth:
-            print('\tdone with frame ', frame_nr)
             frame_nr += 1
         prev_azimuth = azimuth
 
@@ -107,30 +109,6 @@ def load_lidar_data(packet, prev_frame: int, prev_azimuth: int, delta_alpha:floa
     points = np.array(points)
     df_points = pd.DataFrame(points, columns=["frame_nr", "radius", "azimuth", "elevation", "reflectance"])
     return frame_nr, azimuth, df_points
-
-def _extract_palicus_packet(packet, extract_frame: int, columns: List[str], scale: List[float], signed: List[bool]) -> Tuple[bool, bool, pd.DataFrame]:
-    payload = packet.payload.payload.payload.payload.data
-    frame_nr = int.from_bytes(payload[0:2], byteorder='big', signed=False)
-
-    result = None
-    valid = frame_nr == extract_frame
-    continue_ = frame_nr <= extract_frame
-
-    if valid:
-        start = 2
-        point_length = 2 * 3
-        end = start + point_length
-        points = []
-        while end <= len(payload):
-            f0 = int.from_bytes(payload[start:start+2], byteorder='big', signed=signed[0]) * scale[0]
-            f1 = int.from_bytes(payload[start+2:start+4], byteorder='big', signed=signed[1]) * scale[1]
-            f2 = int.from_bytes(payload[start+4:end], byteorder='big', signed=signed[2]) * scale[2]
-            points.append([f0, f1, f2])
-            start = end
-            end = start + point_length
-        result = pd.DataFrame(np.array(points), columns=columns)
-
-    return valid, continue_, result
 
 
 def _load_and_trim_pcap(filepath, frame_min: int = 1, frame_max: int = 525) -> pd.DataFrame:
