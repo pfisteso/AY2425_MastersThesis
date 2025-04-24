@@ -84,7 +84,6 @@ if __name__ == '__main__':
     parser.add_argument('--lidar-ip', required=False, default=LIDAR_IP)
     parser.add_argument('--reload', required=False, type=bool, default=False)
 
-
     args = parser.parse_args()
 
     pc_dir= os.path.join(args.data_dir, 'z_point_clouds', 'ground_truth')

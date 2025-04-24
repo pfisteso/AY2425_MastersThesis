@@ -45,9 +45,9 @@ def parse_palicus_traffic(filepath: str, out_dir: str, ip: str, columns:List[str
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--pipeline', type=str, required=True)
+    parser.add_argument('--pipeline', required=True)
+    parser.add_argument('--input-file', required=True)
 
-    parser.add_argument('--input-dir', type=str, required=False, default='./data')
     parser.add_argument('--palicus-ip', type=str, required=False, default=PALICUS_IP)
     parser.add_argument('--n-frames', type=int, required=False, default=527)
     parser.add_argument('--reload', type=bool, required=False, default=False)

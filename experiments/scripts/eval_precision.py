@@ -3,6 +3,7 @@ import math
 import argparse
 import pandas as pd
 
+
 def eval_precision_point_cloud(ground_truth: str, palicus: str, out_path: str):
     global_result = []
 
@@ -38,6 +39,7 @@ def eval_precision_point_cloud(ground_truth: str, palicus: str, out_path: str):
 
     df_result = pd.DataFrame(global_result, columns=['frame', 'mean error', 'min', 'max'])
     df_result.to_csv(out_path, index=False)
+
 
 def eval_precision_image(ground_truth: str, palicus: str, out_path: str, ftr: str):
     global_result = []
