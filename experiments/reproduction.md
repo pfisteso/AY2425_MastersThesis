@@ -1,5 +1,9 @@
 # Experiment Reproduction
 
+## Prerequisites
+- Ubuntu 20.04
+- Python 3 (*i.e.,*  )
+pip install -r requirements.txt
 
 ## 1. Latency
 1. annotate_pcap
