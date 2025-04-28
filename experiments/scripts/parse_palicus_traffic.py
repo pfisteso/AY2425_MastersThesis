@@ -45,8 +45,9 @@ def parse_palicus_traffic(filepath: str, out_dir: str, ip: str, columns:List[str
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--pipeline', required=True)
     parser.add_argument('--input-file', required=True)
+    parser.add_argument('--pipeline', required=True)
+    parser.add_argument('--output-dir', required=True)
 
     parser.add_argument('--palicus-ip', type=str, required=False, default=PALICUS_IP)
     parser.add_argument('--n-frames', type=int, required=False, default=527)
@@ -71,9 +72,9 @@ if __name__ == '__main__':
         factor = [1, 1, 1/250]
         signed_ = [False, False, True]
 
-    input_file = os.path.join(args.input_dir, pipeline, 'latency', 'traffic_2.pcap')
+    input_file = args.input_file
 
-    output_dir = os.path.join(args.input_dir, pipeline, 'precision', 'palicus')
+    output_dir = args.output_dir
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
