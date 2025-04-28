@@ -6,6 +6,7 @@ import pandas as pd
 
 def eval_precision_point_cloud(ground_truth: str, palicus: str, out_path: str):
     global_result = []
+    excluded_frames = []
 
     for file in os.listdir(ground_truth):
         assert file in os.listdir(palicus), 'invalid file: {}'.format(file)
@@ -23,12 +24,16 @@ def eval_precision_point_cloud(ground_truth: str, palicus: str, out_path: str):
 
         if len(gt) != len(pal):
             print('skip frame ', frame)
+            excluded_frames.append(frame, len(gt), len(pal))
             continue
         df_compare = pd.concat([gt, pal], axis=1)
         df_compare['diff'] = df_compare.apply(lambda row:
-                                        math.sqrt((row['x'] - row['x_pal']) ** 2 +
-                                                  (row['y'] - row['y_pal']) ** 2 +
-                                                  (row['z'] - row['z_pal']) ** 2), axis=1)
+                                              math.sqrt((row['x'] - row['x_pal']) ** 2 +
+                                                        (row['y'] - row['y_pal']) ** 2 +
+                                                        (row['z'] - row['z_pal']) ** 2), axis=1)
+
+        df_compare.to_csv(os.path.join(os.path.dirname(out_path), 'compare_{}.csv'.format(str(frame).zfill(6))),
+                          index=False)
 
         min_ = df_compare.min()['diff']
         max_ = df_compare.max()['diff']
@@ -40,6 +45,9 @@ def eval_precision_point_cloud(ground_truth: str, palicus: str, out_path: str):
     df_result = pd.DataFrame(global_result, columns=['frame', 'mean error', 'min', 'max'])
     df_result.to_csv(out_path, index=False)
 
+    df_excluded = pd.DataFrame(excluded_frames, columns=['frame', 'GT', 'Palicus'])
+    df_excluded.to_csv(os.path.join(os.path.dirname(out_path), 'excluded_frames.csv'), index=False)
+
 
 def eval_precision_image(ground_truth: str, palicus: str, out_path: str, ftr: str):
     global_result = []
@@ -48,14 +56,20 @@ def eval_precision_image(ground_truth: str, palicus: str, out_path: str, ftr: st
         assert file in os.listdir(palicus), 'invalid file: {}'.format(file)
         frame = int(file.split('.')[0])
 
-        gt_image = pd.read_csv(os.path.join(ground_truth, file))
+        gt_image = pd.read_csv(os.path.join(ground_truth, file)).loc[:, ['px', 'py', ftr]]
         gt_image.rename(columns={ftr: 'GT'}, inplace=True)
 
         pal_image = pd.read_csv(os.path.join(palicus, file))
         pal_image.rename(columns={ftr: 'PAL'}, inplace=True)
 
         df_compare = pd.merge(gt_image, pal_image, how='outer', on=['px', 'py'])
-        df_compare['diff'] = df_compare.apply(lambda row: abs(row['GT'] - row['PAL']), axis=1)
+        df_compare['diff'] = df_compare.apply(lambda row: abs(row['GT']) if pd.isna(row['PAL']) else
+                                                          abs(row['PAL']) if pd.isna(row['GT']) else
+                                                          abs(row['GT'] - row['PAL']), axis=1)
+
+        df_compare.to_csv(os.path.join(os.path.dirname(out_path), 'compare_{}.csv'.format(str(frame).zfill(6))),
+                          index=False)
+
         min_ = df_compare.min()['diff']
         max_ = df_compare.max()['diff']
         mean_error = df_compare.mean()['diff']
@@ -93,4 +107,3 @@ if __name__ == '__main__':
 
     else:
         eval_precision_point_cloud(gt_dir, palicus_dir, output_path)
-
