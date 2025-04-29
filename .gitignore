@@ -8,3 +8,4 @@ experiments/data/*/*/palicus*.csv
 experiments/data/*/*/traffic*.pcap
 experiments/data/*/precision/ground_truth
 experiments/data/*/precision/palicus
+experiments/data/*/precision/compare

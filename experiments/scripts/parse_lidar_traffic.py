@@ -44,7 +44,7 @@ def extract_lidar(filepath: str, ip: str, delta_alpha: float, res_dir: str):
 def build_representation(input_dir: str, output_dir: str, pipeline: str, reload: bool):
     assert os.path.exists(input_dir)
     assert os.path.exists(output_dir)
-    assert pipeline in ['bev', 'conversion', 'dm1', 'dm2', 'max', 'roi', 'bev_mean_i', 'bev_count']
+    assert pipeline in ['bev', 'bev_mean', 'conversion', 'dm1', 'dm2', 'roi']
 
     for file in os.listdir(input_dir):
         output_file = os.path.join(output_dir, file)
@@ -61,9 +61,7 @@ def build_representation(input_dir: str, output_dir: str, pipeline: str, reload:
             gt = apply_dm(pc, pipeline=1, delta_alpha=args.delta_phi)
         elif pipeline == 'dm2':
             gt = apply_dm(pc, pipeline=2, delta_alpha=args.delta_phi)
-        elif pipeline == 'bev_count':
-            gt = apply_bev_count(pc)
-        elif pipeline == 'bev_mean_i':
+        elif pipeline == 'bev_mean':
             gt = apply_bev_mean_i(pc)
         else:  # bev, max
             gt = apply_bev(pc)

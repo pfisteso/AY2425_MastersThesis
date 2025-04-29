@@ -55,7 +55,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
     pipeline = args.pipeline
-    assert pipeline in ['bev', 'conversion', 'dm1', 'dm2', 'max', 'roi']
+    assert pipeline in ['bev', 'bev_mean', 'conversion', 'dm1', 'dm2', 'max', 'roi']
 
     if pipeline in ['conversion', 'roi']:
         cols = ['x', 'y', 'z']
@@ -65,6 +65,11 @@ if __name__ == '__main__':
     elif pipeline in ['dm1', 'dm2']:
         cols = ['px', 'py', 'radius']
         factor = [1, 1, 1/500]
+        signed_ = [False, False, False]
+
+    elif pipeline == 'bev_mean':
+        cols = ['px', 'py', 'i']
+        factor = [1, 1, 1]
         signed_ = [False, False, False]
 
     else:  # bev, max

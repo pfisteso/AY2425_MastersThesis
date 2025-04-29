@@ -86,7 +86,8 @@ def apply_bev(point_cloud: pd.DataFrame) -> pd.DataFrame:
 
 def apply_bev_mean_i(point_cloud: pd.DataFrame) -> pd.DataFrame:
     point_cloud = _annotate_bev(point_cloud)
-    bev = point_cloud.groupby(['frame_nr', 'px', 'py']).mean()['reflectance']
+    point_cloud = point_cloud.rename(columns={'reflectance': 'i'})
+    bev = point_cloud.groupby(['frame_nr', 'px', 'py']).mean()['i']
     bev = bev.reset_index(drop=False)
     return bev
 

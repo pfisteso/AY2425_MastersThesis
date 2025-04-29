@@ -90,7 +90,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    assert args.pipeline in ['bev', 'conversion', 'dm1', 'dm2', 'max', 'roi']
+    assert args.pipeline in ['bev', 'bev_mean', 'conversion', 'dm1', 'dm2', 'roi']
 
     gt_dir = os.path.join(args.data_dir, args.pipeline, 'precision', 'ground_truth')
     palicus_dir = os.path.join(args.data_dir, args.pipeline, 'precision', 'palicus')
@@ -101,8 +101,8 @@ if __name__ == '__main__':
 
     output_path = os.path.join(args.data_dir, args.pipeline, 'precision', 'precision.csv')
 
-    if args.pipeline in ['dm1', 'dm2', 'bev', 'max']:
-        f = 'z' if args.pipeline in ['bev', 'max'] else 'radius'
+    if args.pipeline in ['dm1', 'dm2', 'bev', 'bev_mean']:
+        f = 'z' if args.pipeline == 'bev' else 'i' if args.pipeline == 'bev_mean' else 'radius'
         eval_precision_image(gt_dir, palicus_dir, output_path, f)
 
     else:
