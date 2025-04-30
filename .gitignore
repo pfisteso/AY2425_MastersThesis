@@ -1,6 +1,7 @@
 *venv
 */*venv
 experiments/.idea
+experiments/data/out
 experiments/data/*.pcap
 experiments/data/z_point_clouds
 experiments/data/*/*/lidar*.csv
