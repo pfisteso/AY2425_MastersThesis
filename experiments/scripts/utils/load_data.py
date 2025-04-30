@@ -10,9 +10,13 @@ def load_latency_data(pipeline: str = 'conversion', frame_min: int = 1, frame_ma
     return _load_and_trim_pcap(filepath, frame_min, frame_max)
 
 
-def load_frame_size_data(pipeline: str = 'conversion', experiment: str ='point_rate',
+def load_frame_size_data(pipeline: str = 'conversion', experiment: str ='point_rate', throughput: int = 8,
                          frame_min: int = 1, frame_max: int = 525) -> pd.DataFrame:
-    filepath = os.path.join('./data', pipeline, experiment, 'frame_size.csv')
+    assert experiment in ['point_rate', 'latency']
+    if experiment == 'latency':
+        filepath = os.path.join('./data', pipeline, experiment, 'frame_size.csv')
+    else:  # 'point_rate'
+        filepath = os.path.join('./data', pipeline, experiment, 'frame_size_{}.csv'.format(throughput))
     return _load_and_trim_pcap(filepath, frame_min, frame_max)
 
 
