@@ -7,6 +7,9 @@ import pandas as pd
 def eval_precision_point_cloud(ground_truth: str, palicus: str, out_path: str):
     global_result = []
     excluded_frames = []
+    intermediate_dir = os.path.join(os.path.dirname(out_path), 'compare')
+    if not os.path.exists(intermediate_dir):
+        os.makedirs(intermediate_dir)
 
     for file in os.listdir(ground_truth):
         assert file in os.listdir(palicus), 'invalid file: {}'.format(file)
@@ -24,7 +27,7 @@ def eval_precision_point_cloud(ground_truth: str, palicus: str, out_path: str):
 
         if len(gt) != len(pal):
             print('skip frame ', frame)
-            excluded_frames.append(frame, len(gt), len(pal))
+            excluded_frames.append([frame, len(gt), len(pal)])
             continue
         df_compare = pd.concat([gt, pal], axis=1)
         df_compare['diff'] = df_compare.apply(lambda row:
@@ -32,7 +35,7 @@ def eval_precision_point_cloud(ground_truth: str, palicus: str, out_path: str):
                                                         (row['y'] - row['y_pal']) ** 2 +
                                                         (row['z'] - row['z_pal']) ** 2), axis=1)
 
-        df_compare.to_csv(os.path.join(os.path.dirname(out_path), 'compare_{}.csv'.format(str(frame).zfill(6))),
+        df_compare.to_csv(os.path.join(intermediate_dir, file),
                           index=False)
 
         min_ = df_compare.min()['diff']
@@ -51,6 +54,9 @@ def eval_precision_point_cloud(ground_truth: str, palicus: str, out_path: str):
 
 def eval_precision_image(ground_truth: str, palicus: str, out_path: str, ftr: str):
     global_result = []
+    intermediate_dir = os.path.join(os.path.dirname(out_path), 'compare')
+    if not os.path.exists(intermediate_dir):
+        os.makedirs(intermediate_dir)
 
     for file in os.listdir(ground_truth):
         assert file in os.listdir(palicus), 'invalid file: {}'.format(file)
@@ -67,7 +73,7 @@ def eval_precision_image(ground_truth: str, palicus: str, out_path: str, ftr: st
                                                           abs(row['PAL']) if pd.isna(row['GT']) else
                                                           abs(row['GT'] - row['PAL']), axis=1)
 
-        df_compare.to_csv(os.path.join(os.path.dirname(out_path), 'compare_{}.csv'.format(str(frame).zfill(6))),
+        df_compare.to_csv(os.path.join(intermediate_dir, file),
                           index=False)
 
         min_ = df_compare.min()['diff']
