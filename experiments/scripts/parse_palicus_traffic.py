@@ -70,7 +70,7 @@ if __name__ == '__main__':
     elif pipeline == 'bev_mean':
         cols = ['px', 'py', 'i']
         factor = [1, 1, 1]
-        signed_ = [False, False, False]
+        signed_ = [False, False, True]
 
     else:  # bev, max
         cols = ['px', 'py', 'z']

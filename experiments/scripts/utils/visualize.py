@@ -1,6 +1,6 @@
 import os
 import pandas as pd
-# import open3d as o3d
+import open3d as o3d
 from PIL import Image
 from PIL.ImageOps import flip
 
@@ -25,7 +25,8 @@ def visualize2d(frame: pd.DataFrame, min_color:float, max_color: float, flip_img
 
     img = Image.new(mode='L', size=(width, height), color=0)
     for row in frame.itertuples():
-        img.putpixel((int(row.px), int(row.py)), int(row.color))
+        if row.color <= 255:
+            img.putpixel((int(row.px), int(row.py)), int(row.color))
     if flip_img:
         img = flip(img)
     return img
@@ -35,18 +36,18 @@ def visualize3d(frame: pd.DataFrame):
     intermediate_path = './point_cloud.png'
     pc_data = frame.loc[:, ['x', 'y', 'z']].drop_duplicates().to_numpy()
 
-    # point_cloud = o3d.geometry.PointCloud(o3d.utility.Vector3dVector(pc_data))
-    # visualizer = o3d.visualization.Visualizer()
-    # visualizer.create_window()
-    # visualizer.add_geometry(point_cloud)
-    # visualizer.poll_events()
-    # visualizer.update_renderer()
-    # visualizer.capture_screen_image(intermediate_path)
-    # visualizer.destroy_window()
-    #
-    # img = Image.open(intermediate_path)
-    # os.remove(intermediate_path)
-    img = None
+    point_cloud = o3d.geometry.PointCloud(o3d.utility.Vector3dVector(pc_data))
+    visualizer = o3d.visualization.Visualizer()
+    visualizer.create_window()
+    visualizer.add_geometry(point_cloud)
+    visualizer.poll_events()
+    visualizer.update_renderer()
+    visualizer.capture_screen_image(intermediate_path)
+    visualizer.destroy_window()
+
+    img = Image.open(intermediate_path)
+    os.remove(intermediate_path)
+
     return img
 
 
