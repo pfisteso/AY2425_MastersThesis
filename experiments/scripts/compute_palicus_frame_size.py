@@ -7,8 +7,7 @@ from pcapkit import extract
 from utils.constants import PALICUS_IP
 
 
-def eval_frame_size(directory: str, throughput: List[int], palicus_ip: str, n_ftrs: int, experiment: str,
-                    reload: bool = False):
+def eval_frame_size(directory: str, throughput: List[int], palicus_ip: str, n_ftrs: int):
     assert os.path.exists(directory), 'invalid input directory'
 
     for t in throughput:
@@ -43,17 +42,13 @@ def eval_frame_size(directory: str, throughput: List[int], palicus_ip: str, n_ft
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--input-dir', required=True)
-    parser.add_argument('--experiment', required=True)
+
     parser.add_argument('--palicus_ip', required=False, default=PALICUS_IP)
     parser.add_argument('--n-ftrs', required=False, type=int, default=3)
-    parser.add_argument('--reload', required=False, type=bool, default=False)
 
     args = parser.parse_args()
     input_dir = args.input_dir
 
-    assert args.experiment in ['latency', 'point_rate'], 'invalid experiment {}'.format(args.experiment)
+    throughput =  [8, 16, 32, 64, 128]
 
-    throughput = [1, 2, 3, 4, 5] if args.experiment == 'latency' else [128]
-
-    eval_frame_size(input_dir, throughput=throughput, palicus_ip=args.palicus_ip, n_ftrs=args.n_ftrs,
-                    experiment=args.experiment, reload=args.reload)
+    eval_frame_size(input_dir, throughput=throughput, palicus_ip=args.palicus_ip, n_ftrs=args.n_ftrs)
