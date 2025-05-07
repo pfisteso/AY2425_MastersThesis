@@ -91,7 +91,7 @@ def load_lidar_data(packet, prev_frame: int, prev_azimuth: int, delta_alpha:floa
 
         # second firing sequence: interpolate azimuth
         azimuth += delta_alpha
-        azimuth = azimuth - 360.0 if azimuth > 360.0 else azimuth
+        azimuth = azimuth - 360.0 if azimuth >= 360.0 else azimuth
         if azimuth < prev_azimuth:
             frame_nr += 1
         prev_azimuth = azimuth

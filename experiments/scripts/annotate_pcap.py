@@ -47,6 +47,7 @@ def annotate_pacp_traffic(input_file: str, output_dir: str, palicus_ip: str, lid
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--input-dir", metavar='dir', required=True, help='path to directory')
+
     parser.add_argument("--lidar-ip", metavar='lidar_ip', required=False, default=LIDAR_IP)
     parser.add_argument("--palicus-ip", metavar='palicus_ip', required=False, default=PALICUS_IP)
     parser.add_argument('--delta-phi', type=float, default=0.1,

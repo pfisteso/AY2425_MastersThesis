@@ -25,7 +25,7 @@ def annotate_lidar_packet(packet, pkt_nr: int, curr_frame_nr: int, delta_phi: fl
         prev_azimuth = azimuth
         # second firing sequence: interpolate azimuth
         azimuth += delta_phi
-        azimuth = azimuth - 360.0 if azimuth > 360.0 else azimuth
+        azimuth = azimuth - 360.0 if azimuth >= 360.0 else azimuth
         if azimuth < prev_azimuth:
             if start > 2:
                 package_frame.append([pkt_nr, timestamp, frame_nr])
