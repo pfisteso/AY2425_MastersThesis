@@ -25,8 +25,9 @@ def visualize2d(frame: pd.DataFrame, min_color:float, max_color: float, flip_img
 
     img = Image.new(mode='L', size=(width, height), color=0)
     for row in frame.itertuples():
-        if row.color <= 255:
-            img.putpixel((int(row.px), int(row.py)), int(row.color))
+        color = max(0, row.color)
+        color = min(255, row.color)
+        img.putpixel((int(row.px), int(row.py)), color)
     if flip_img:
         img = flip(img)
     return img
