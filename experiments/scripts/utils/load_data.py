@@ -12,7 +12,7 @@ def load_latency_data(pipeline: str = 'conversion', frame_min: int = 1, frame_ma
 
 def load_frame_size_data(pipeline: str = 'conversion', throughput: int = 8,
                          frame_min: int = 1, frame_max: int = 525) -> pd.DataFrame:
-    filepath = os.path.join('./data', pipeline, 'point_rate', 'frame_size_{}.csv'.format(throughput))
+    filepath = os.path.join('./data', pipeline, 'throughput', 'frame_size_{}.csv'.format(throughput))
     return _load_and_trim_pcap(filepath, frame_min, frame_max)
 
 
