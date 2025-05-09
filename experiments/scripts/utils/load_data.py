@@ -41,6 +41,7 @@ def load_representation(pipeline: str, frame_nr: int, ground_truth: bool = False
 
     return pd.read_csv(filepath)
 
+
 def load_precision_data(pipeline: str) -> pd.DataFrame:
     filepath = os.path.join('./data', pipeline, 'precision', 'precision.csv')
     assert os.path.exists(filepath), 'invalid file path: {}'.format(filepath)
