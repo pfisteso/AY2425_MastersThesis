@@ -10,3 +10,7 @@ experiments/data/*/*/traffic*.pcap
 experiments/data/*/precision/ground_truth
 experiments/data/*/precision/palicus
 experiments/data/*/precision/compare
+experiments/data/*/throughput/palicus_*
+experiments/scripts/__pycache__
+experiments/scripts/*/__pycache__
+experiments/scripts/*/*/__pycache__

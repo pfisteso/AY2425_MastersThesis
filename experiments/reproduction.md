@@ -17,7 +17,7 @@ pip install -r requirements.txt
 
 ## 3. Point Rate
 1. compute_palicus_frame_size
-2. point_rate_ground_truth
+2. throughput_ground_truth
 
 
 # Visualization
