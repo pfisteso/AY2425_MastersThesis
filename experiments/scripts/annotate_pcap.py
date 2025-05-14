@@ -8,7 +8,9 @@ from utils import annotate_lidar_packet, annotate_palicus_packet
 from utils.constants import LIDAR_IP, PALICUS_IP
 
 def annotate_pacp_traffic(input_file: str, output_dir: str, palicus_ip: str, lidar_ip: str, delta_phi: float, t: int):
-    assert os.path.exists(input_file) and os.path.isfile(input_file) and input_file.endswith('.pcap'), 'invalid input file'
+    assert os.path.exists(input_file), '(1) invalid input file: {}'.format(input_file)
+    assert os.path.isfile(input_file), '(2) invalid input file: {}'.format(input_file)
+    assert input_file.endswith('.pcap'), '(3) invalid input file: {}'.format(input_file)
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
@@ -46,17 +48,25 @@ def annotate_pacp_traffic(input_file: str, output_dir: str, palicus_ip: str, lid
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--input-dir", metavar='dir', required=True, help='path to directory')
+    parser.add_argument("--input-dir", required=True, help='path to directory')
 
+    parser.add_argument("--experiment", default='latency')
     parser.add_argument("--lidar-ip", metavar='lidar_ip', required=False, default=LIDAR_IP)
     parser.add_argument("--palicus-ip", metavar='palicus_ip', required=False, default=PALICUS_IP)
     parser.add_argument('--delta-phi', type=float, default=0.1,
                         help='horizontal angular resolution of the captured lidar data')
 
     args = parser.parse_args()
-    for tfile in range(1, 6):
+    if args.experiment == 'latency':
+        file_numbers = [i for i in range(1, 6)]
+    elif args.experiment == 'throughput':
+        file_numbers = [8, 16, 32, 64, 128]
+    else:
+        raise AssertionError('experiment must be latency or throughput')
+
+    for tfile in file_numbers:
         input_file = os.path.join(args.input_dir, 'traffic_{}.pcap'.format(tfile))
 
         annotate_pacp_traffic(input_file, args.input_dir,
-                          palicus_ip=args.palicus_ip, lidar_ip=args.lidar_ip,
-                          delta_phi=args.delta_phi, t=tfile)
+                              palicus_ip=args.palicus_ip, lidar_ip=args.lidar_ip,
+                              delta_phi=args.delta_phi, t=tfile)

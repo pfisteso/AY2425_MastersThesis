@@ -5,10 +5,10 @@ import pandas as pd
 from datetime import timedelta, datetime
 
 
-def compute_latency(input_dir: str):
+def compute_latency(input_dir: str, file_numbers):
     df_res = None
     assert os.path.exists(input_dir), 'invalid input directory'
-    for t in range(1, 6):
+    for t in file_numbers:
         print('computing latency for sample ', t)
         lidar_file = os.path.join(input_dir, "lidar_{}.csv".format(t))
         assert os.path.exists(lidar_file), 'lidar file not found'
@@ -55,9 +55,14 @@ def compute_latency(input_dir: str):
 
 
 if __name__ == "__main__":
-    arg_parser = argparse.ArgumentParser()
-    arg_parser.add_argument("--input-dir", metavar="input_dir", required=True,
-                            help="Input directory containing the traffic_data")
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--input-dir", required=True,
+                        help="Input directory containing the traffic_data")
+    parser.add_argument("--experiment", default='latency', required=False)
 
-    args = arg_parser.parse_args()
-    compute_latency(args.input_dir)
+    args = parser.parse_args()
+
+    assert args.experiment in ['latency', 'throughput'], 'invalid experiment'
+    f_nrs = [i for i in range(1, 6)] if args.experiment == 'latency' else [8, 16, 32, 64, 128]
+
+    compute_latency(args.input_dir, f_nrs)
