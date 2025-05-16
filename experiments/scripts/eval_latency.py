@@ -63,6 +63,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     assert args.experiment in ['latency', 'throughput'], 'invalid experiment'
-    f_nrs = [i for i in range(1, 6)] if args.experiment == 'latency' else [8, 16, 32, 64, 128]
+    f_nrs = [i for i in range(1, 4)] if args.experiment == 'latency' else [8, 16, 32, 64, 128]
 
     compute_latency(args.input_dir, f_nrs)

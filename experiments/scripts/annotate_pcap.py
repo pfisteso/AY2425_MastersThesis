@@ -58,7 +58,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     if args.experiment == 'latency':
-        file_numbers = [i for i in range(1, 6)]
+        file_numbers = [i for i in range(1, 4)]
     elif args.experiment == 'throughput':
         file_numbers = [8, 16, 32, 64, 128]
     else:
